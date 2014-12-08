@@ -65,6 +65,11 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
 
                 scope.$close = function(){
                     templateElement.css('opacity',0).attr('data-closing','true');
+                    templateElement.removeClass("ns-show").addClass("ns-hide");
+                    $timeout(function(){
+                        // Remove HTML markup
+                        templateElement.remove();
+                    }, 500);
                     layoutMessages();
                 };
 
@@ -134,33 +139,13 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             for(var i = messageElements.length - 1; i >= 0; i --){
                 var element = messageElements[i];
                 element.css('opacity',0);
+                element.removeClass("ns-show").addClass("ns-hide");
+                $timeout(function(){
+                    element.remove();
+                }, 500);
             }
         };
 
         return notify;
     }
 ]);
-
-angular.module('cgNotify').run(['$templateCache', function($templateCache) {
-  'use strict';
-
-  $templateCache.put('angular-notify.html',
-    "<div class=\"cg-notify-message\" ng-class=\"$classes\">\n" +
-    "\n" +
-    "    <div ng-show=\"!$messageTemplate\">\n" +
-    "        {{$message}}\n" +
-    "    </div>\n" +
-    "\n" +
-    "    <div ng-show=\"$messageTemplate\" class=\"cg-notify-message-template\">\n" +
-    "        \n" +
-    "    </div>\n" +
-    "\n" +
-    "    <button type=\"button\" class=\"cg-notify-close\" ng-click=\"$close()\">\n" +
-    "        <span aria-hidden=\"true\">&times;</span>\n" +
-    "        <span class=\"cg-notify-sr-only\">Close</span>\n" +
-    "    </button>\n" +
-    "\n" +
-    "</div>"
-  );
-
-}]);

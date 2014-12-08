@@ -65,6 +65,11 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
 
                 scope.$close = function(){
                     templateElement.css('opacity',0).attr('data-closing','true');
+                    templateElement.removeClass("ns-show").addClass("ns-hide");
+                    $timeout(function(){
+                        // Remove HTML markup
+                        templateElement.remove();
+                    }, 500);
                     layoutMessages();
                 };
 
@@ -134,6 +139,10 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             for(var i = messageElements.length - 1; i >= 0; i --){
                 var element = messageElements[i];
                 element.css('opacity',0);
+                element.removeClass("ns-show").addClass("ns-hide");
+                $timeout(function(){
+                    element.remove();
+                }, 500);
             }
         };
 
