@@ -7,6 +7,8 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
         var defaultTemplateUrl = 'angular-notify.html';
         var position = 'center';
         var container = document.body;
+        var classes = '';
+        var persistent = false;
 
         var messageElements = [];
 
@@ -19,12 +21,14 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             args.templateUrl = args.templateUrl ? args.templateUrl : defaultTemplateUrl;
             args.position = args.position ? args.position : position;
             args.container = args.container ? args.container : container;
-            args.classes = args.classes ? args.classes : '';
+            args.classes = args.classes ? args.classes : classes;
+            args.persistent = args.persistent ? args.persistent : persistent;
 
             var scope = args.scope ? args.scope.$new() : $rootScope.$new();
             scope.$message = args.message;
             scope.$classes = args.classes;
             scope.$messageTemplate = args.messageTemplate;
+            scope.$persistent = args.persistent;
 
             $http.get(args.templateUrl,{cache: $templateCache}).success(function(template){
 
@@ -95,10 +99,10 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
                     layoutMessages();
                 });
 
-                if (duration > 0){
+                if (!args.persistent && duration > 0){
                     $timeout(function(){
                         scope.$close();
-                    },duration);
+                    }, duration);
                 }
 
             }).error(function(data){
@@ -133,6 +137,8 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             defaultTemplateUrl = args.templateUrl ? args.templateUrl : defaultTemplateUrl;
             position = !angular.isUndefined(args.position) ? args.position : position;
             container = args.container ? args.container : container;
+            classes = args.classes ? args.classes : classes;
+            persistent = args.persistent ? args.persistent : persistent;
         };
 
         notify.closeAll = function(){
