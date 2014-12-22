@@ -5,10 +5,12 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
         var verticalSpacing = 15;
         var duration = 10000;
         var defaultTemplateUrl = 'angular-notify.html';
-        var position = 'center';
+        var position = '';
         var container = document.body;
         var classes = '';
         var persistent = false;
+        var single = false;
+        // var toggleable = false;
 
         var messageElements = [];
 
@@ -23,6 +25,13 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             args.container = args.container ? args.container : container;
             args.classes = args.classes ? args.classes : classes;
             args.persistent = args.persistent ? args.persistent : persistent;
+            args.duration = args.duration ? args.duration : duration;
+            args.startTop = args.startTop ? args.startTop : startTop;
+            args.single = args.single ? args.single : single;
+            // args.toggleable = args.toggleable ? args.toggleable : toggleable;
+
+            if(args.single)
+                args.classes += ' ns-single';
 
             var scope = args.scope ? args.scope.$new() : $rootScope.$new();
             scope.$message = args.message;
@@ -38,8 +47,10 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
                         (e.originalEvent && e.originalEvent.propertyName === 'opacity')){
 
                         templateElement.remove();
-                        messageElements.splice(messageElements.indexOf(templateElement),1);
-                        layoutMessages();
+                        if(!args.single){
+                            messageElements.splice(messageElements.indexOf(templateElement),1);
+                            layoutMessages();
+                        }
                     }
                 });
 
@@ -59,50 +70,83 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
                 }
 
                 angular.element(args.container).append(templateElement);
-                messageElements.push(templateElement);
 
-                if (args.position === 'center'){
-                    $timeout(function(){
-                        templateElement.css('margin-left','-' + (templateElement[0].offsetWidth /2) + 'px');
-                    });
+                if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
+                    templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
+                }
+
+                if(!args.single){
+                    messageElements.push(templateElement);
+
+
+                    if (args.position === 'center'){
+                        $timeout(function(){
+                            templateElement.css('margin-left','-' + (templateElement[0].offsetWidth /2) + 'px');
+                        });
+                    }
                 }
 
                 scope.$close = function(){
-                    templateElement.css('opacity',0).attr('data-closing','true');
-                    templateElement.removeClass("ns-show").addClass("ns-hide");
-                    $timeout(function(){
-                        // Remove HTML markup
-                        templateElement.remove();
-                    }, 500);
-                    layoutMessages();
+                    // if(!args.toggleable){
+
+                        if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
+                            templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
+                        } else{
+                            templateElement.css('opacity',0).attr('data-closing','true');
+                        }
+
+                        templateElement.removeClass("ns-show").addClass("ns-hide");
+                        $timeout(function(){
+                            // Remove HTML markup
+                            templateElement.remove();
+                            if(!args.single){
+                                messageElements.splice(messageElements.indexOf(templateElement),1);
+                                $('body').addClass('notice-box-closing');
+                                setTimeout(function() { $('body').removeClass('notice-box-closing'); }, 250);
+                                layoutMessages();
+                            }
+                        }, 500);
+                    // } else{
+                        // templateElement.css({
+                        //     bottom: '-' + templateElement.outerHeight() + 'px',
+                        // });
+                        // templateElement.removeClass("ns-show").addClass("ns-hide");
+                    // }
+
+
                 };
+
 
                 var layoutMessages = function(){
                     var j = 0;
-                    var currentY = startTop;
-                    for(var i = messageElements.length - 1; i >= 0; i --){
+                    var currentY = args.startTop;
+                    // for(var i = messageElements.length - 1; i >= 0; i --){
+                    for(var i = 0; i < messageElements.length; i++){
                         var shadowHeight = 10;
                         var element = messageElements[i];
                         var height = element[0].offsetHeight;
                         var top = currentY + height + shadowHeight;
                         if (element.attr('data-closing')){
-                            top += 20;
+                            // top += 20;
                         } else {
                             currentY += height + verticalSpacing;
                         }
+
                         element.css('top',top + 'px').css('margin-top','-' + (height+shadowHeight) + 'px').css('visibility','visible');
+
                         j ++;
                     }
                 };
 
-                $timeout(function(){
-                    layoutMessages();
-                });
+                if(!args.single)
+                    $timeout(function(){
+                        layoutMessages();
+                    });
 
-                if (!args.persistent && duration > 0){
+                if (!args.persistent && args.duration > 0){
                     $timeout(function(){
                         scope.$close();
-                    }, duration);
+                    }, args.duration);
                 }
 
             }).error(function(data){
@@ -110,7 +154,7 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             });
 
             var retVal = {};
-            
+
             retVal.close = function(){
                 if (scope.$close){
                     scope.$close();
