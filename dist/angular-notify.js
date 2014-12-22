@@ -1,5 +1,5 @@
-angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','$templateCache','$rootScope',
-    function($timeout,$http,$compile,$templateCache,$rootScope){
+angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http','$compile','$templateCache','$rootScope','$sce',
+    function($timeout,$http,$compile,$templateCache,$rootScope,$sce){
 
         var startTop = 10;
         var verticalSpacing = 15;
@@ -10,6 +10,7 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
         var classes = '';
         var persistent = false;
         var single = false;
+        var closable = false;
         // var toggleable = false;
 
         var messageElements = [];
@@ -28,6 +29,7 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             args.duration = args.duration ? args.duration : duration;
             args.startTop = args.startTop ? args.startTop : startTop;
             args.single = args.single ? args.single : single;
+            args.closable = args.closable ? args.closable : closable;
             // args.toggleable = args.toggleable ? args.toggleable : toggleable;
 
             if(args.single)
@@ -38,6 +40,7 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             scope.$classes = args.classes;
             scope.$messageTemplate = args.messageTemplate;
             scope.$persistent = args.persistent;
+            scope.$closable = args.closable;
 
             $http.get(args.templateUrl,{cache: $templateCache}).success(function(template){
 
@@ -116,6 +119,10 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
 
                 };
 
+                scope.$bindFullHTML = function(html){
+                    return $sce.trustAsHtml(html);
+                }
+
 
                 var layoutMessages = function(){
                     var j = 0;
@@ -183,6 +190,7 @@ angular.module('cgNotify', []).factory('notify',['$timeout','$http','$compile','
             container = args.container ? args.container : container;
             classes = args.classes ? args.classes : classes;
             persistent = args.persistent ? args.persistent : persistent;
+            closable = args.closable ? args.closable : closable;
         };
 
         notify.closeAll = function(){
