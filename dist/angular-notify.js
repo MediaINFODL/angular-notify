@@ -11,7 +11,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
         var persistent = false;
         var single = false;
         var closable = false;
-        // var toggleable = false;
+        var toggleable = false;
 
         var messageElements = [];
 
@@ -30,7 +30,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             args.startTop = args.startTop ? args.startTop : startTop;
             args.single = args.single ? args.single : single;
             args.closable = args.closable ? args.closable : closable;
-            // args.toggleable = args.toggleable ? args.toggleable : toggleable;
+            args.toggleable = args.toggleable ? args.toggleable : toggleable;
 
             if(args.single)
                 args.classes += ' ns-single';
@@ -41,6 +41,8 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             scope.$messageTemplate = args.messageTemplate;
             scope.$persistent = args.persistent;
             scope.$closable = args.closable;
+            scope.$toggleable = args.toggleable;
+            scope.$state = false;
 
             $http.get(args.templateUrl,{cache: $templateCache}).success(function(template){
 
@@ -78,6 +80,8 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
                     templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
                 }
 
+                scope.$state = true;
+
                 if(!args.single){
                     messageElements.push(templateElement);
 
@@ -90,7 +94,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
                 }
 
                 scope.$close = function(){
-                    // if(!args.toggleable){
+                    if(!args.toggleable){
 
                         if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
                             templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
@@ -99,6 +103,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
                         }
 
                         templateElement.removeClass("ns-show").addClass("ns-hide");
+                        scope.$state = false;
                         $timeout(function(){
                             // Remove HTML markup
                             templateElement.remove();
@@ -109,15 +114,34 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
                                 layoutMessages();
                             }
                         }, 500);
-                    // } else{
-                        // templateElement.css({
-                        //     bottom: '-' + templateElement.outerHeight() + 'px',
-                        // });
-                        // templateElement.removeClass("ns-show").addClass("ns-hide");
-                    // }
+                    } else{
+
+                        scope.$hide();
+                    }
 
 
                 };
+
+                scope.$show = function(){
+                    console.log("notify >>> show");
+                    if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
+                        templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
+                    } else{
+                        templateElement.css('opacity',1).attr('data-closing','false');
+                    }
+                    scope.$state = true;
+                    templateElement.removeClass("ns-hide").addClass("ns-show");
+                }
+                scope.$hide = function(){
+                    console.log("notify >>> hide");
+                    if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
+                        templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
+                    } else{
+                        templateElement.css('opacity',0).attr('data-closing','true');
+                    }
+                    scope.$state = false;
+                    templateElement.removeClass("ns-show").addClass("ns-hide");
+                }
 
                 scope.$bindFullHTML = function(html){
                     return $sce.trustAsHtml(html);
@@ -163,9 +187,23 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             var retVal = {};
 
             retVal.close = function(){
+                console.log("kaboom");
                 if (scope.$close){
                     scope.$close();
                 }
+            };
+            retVal.show = function(){
+                if (scope.$show){
+                    scope.$show();
+                }
+            };
+            retVal.hide = function(){
+                if (scope.$hide){
+                    scope.$hide();
+                }
+            };
+            retVal.getState = function(){
+                return scope.$state;
             };
 
             Object.defineProperty(retVal,'message',{
@@ -191,6 +229,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             classes = args.classes ? args.classes : classes;
             persistent = args.persistent ? args.persistent : persistent;
             closable = args.closable ? args.closable : closable;
+            toggleable = args.toggleable ? args.toggleable : toggleable;
         };
 
         notify.closeAll = function(){
