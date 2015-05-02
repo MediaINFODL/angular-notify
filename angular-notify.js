@@ -123,7 +123,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
                 };
 
                 scope.$show = function(){
-                    console.log("notify >>> show");
+                    // console.log("notify >>> show");
                     if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
                         templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
                     } else{
@@ -133,7 +133,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
                     templateElement.removeClass("ns-hide").addClass("ns-show");
                 }
                 scope.$hide = function(){
-                    console.log("notify >>> hide");
+                    // console.log("notify >>> hide");
                     if(templateElement.hasClass('ns-effect-slide') && templateElement.hasClass('ns-bottomright')){
                         templateElement.css({ bottom: '-' + templateElement.outerHeight() + 'px', });
                     } else{
@@ -187,7 +187,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             var retVal = {};
 
             retVal.close = function(){
-                console.log("kaboom");
+                // console.log("kaboom");
                 if (scope.$close){
                     scope.$close();
                 }

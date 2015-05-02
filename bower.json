@@ -4,7 +4,7 @@
     "dist/angular-notify.js",
     "dist/angular-notify.css"
   ],
-  "version": "2.0.7",
+  "version": "2.0.8",
   "homepage": "https://github.com/cgross/angular-notify",
   "authors": [
     "Chris Gross <schtoo@schtoo.com>"
