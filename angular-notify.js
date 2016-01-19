@@ -6,7 +6,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
         var duration = 10000;
         var defaultTemplateUrl = 'angular-notify.html';
         var position = '';
-        var container = document.body;
+        var container = '#notify'; // document.body;
         var classes = '';
         var persistent = false;
         var single = false;
@@ -225,7 +225,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             duration = !angular.isUndefined(args.duration) ? args.duration : duration;
             defaultTemplateUrl = args.templateUrl ? args.templateUrl : defaultTemplateUrl;
             position = !angular.isUndefined(args.position) ? args.position : position;
-            container = args.container ? args.container : container;
+            container = container; // args.container ? args.container : container;
             classes = args.classes ? args.classes : classes;
             persistent = args.persistent ? args.persistent : persistent;
             closable = args.closable ? args.closable : closable;

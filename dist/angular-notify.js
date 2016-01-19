@@ -6,7 +6,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
         var duration = 10000;
         var defaultTemplateUrl = 'angular-notify.html';
         var position = '';
-        var container = document.body;
+        var container = '#notify'; // document.body;
         var classes = '';
         var persistent = false;
         var single = false;
@@ -225,7 +225,7 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
             duration = !angular.isUndefined(args.duration) ? args.duration : duration;
             defaultTemplateUrl = args.templateUrl ? args.templateUrl : defaultTemplateUrl;
             position = !angular.isUndefined(args.position) ? args.position : position;
-            container = args.container ? args.container : container;
+            container = container; // args.container ? args.container : container;
             classes = args.classes ? args.classes : classes;
             persistent = args.persistent ? args.persistent : persistent;
             closable = args.closable ? args.closable : closable;
@@ -246,27 +246,3 @@ angular.module('cgNotify', ['ngSanitize']).factory('notify',['$timeout','$http',
         return notify;
     }
 ]);
-
-angular.module('cgNotify').run(['$templateCache', function($templateCache) {
-  'use strict';
-
-  $templateCache.put('angular-notify.html',
-    "<div class=\"cg-notify-message\" ng-class=\"$classes\">\n" +
-    "\n" +
-    "    <div ng-show=\"!$messageTemplate\">\n" +
-    "        {{$message}}\n" +
-    "    </div>\n" +
-    "\n" +
-    "    <div ng-show=\"$messageTemplate\" class=\"cg-notify-message-template\">\n" +
-    "        \n" +
-    "    </div>\n" +
-    "\n" +
-    "    <button type=\"button\" class=\"cg-notify-close\" ng-click=\"$close()\">\n" +
-    "        <span aria-hidden=\"true\">&times;</span>\n" +
-    "        <span class=\"cg-notify-sr-only\">Close</span>\n" +
-    "    </button>\n" +
-    "\n" +
-    "</div>"
-  );
-
-}]);
